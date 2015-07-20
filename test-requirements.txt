@@ -1,0 +1,7 @@
+nose
+mock
+coverage
+requests_unixsocket
+httmock
+pep8
+pylint
