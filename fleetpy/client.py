@@ -74,14 +74,6 @@ class Client(object):
     def __init__(self, endpoint=None):
         self._adapter = _Adapter(endpoint)
 
-    def create_unit(self, name, version=None, from_str=None, from_file=None):
-        value = unit.Unit(self._adapter, name, version)
-        if from_str:
-            value.read_string(value)
-        elif from_file:
-            value.read_file(from_file)
-        return value
-
     def machines(self):
         """Query Fleet returning a list of machines as namedtuples:
 
@@ -95,9 +87,49 @@ class Client(object):
     def state(self):
         """
 
-        :return:
+        :rtype: list
+
         """
         return self._list_states()
+
+    def unit(self, name, version=None, from_str=None, from_file=None):
+        """
+
+        :param str name:
+        :param str version:
+        :param str from_str:
+        :param str from_file:
+        :type: fleetpy.unit.Unit
+
+        """
+        value = unit.Unit(self._adapter, name, version)
+        if from_str:
+            value.read_string(value)
+        elif from_file:
+            value.read_file(from_file)
+        return value
+
+    def units(self):
+        """
+
+        :rtype: list
+
+        """
+        return self._list_units()
+
+    def _list_machines(self, next_page_token=None):
+        machines = list()
+        response = self._adapter.get('machines', next_page_token)
+        if response.status_code == 200:
+            data = response.json()
+            for row in data.get('machines'):
+                machines.append(MACHINE(row['id'],
+                                        row['primaryIP'],
+                                        row['metadata']))
+            if 'nextPageToken' in data:
+                LOGGER.debug('Retrieving next page of results')
+                machines += self._list_machines(data['next_page_token'])
+        return machines
 
     def _list_states(self, next_page_token=None):
         states = []
@@ -115,23 +147,6 @@ class Client(object):
                 LOGGER.debug('Retrieving next page of results')
                 states += self._list_states(data['next_page_token'])
         return states
-
-    def units(self):
-        return self._list_units()
-
-    def _list_machines(self, next_page_token=None):
-        machines = list()
-        response = self._adapter.get('machines', next_page_token)
-        if response.status_code == 200:
-            data = response.json()
-            for row in data.get('machines'):
-                machines.append(MACHINE(row['id'],
-                                        row['primaryIP'],
-                                        row['metadata']))
-            if 'nextPageToken' in data:
-                LOGGER.debug('Retrieving next page of results')
-                machines += self._list_machines(data['next_page_token'])
-        return machines
 
     def _list_units(self, next_page_token=None):
         units = list()
