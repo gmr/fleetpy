@@ -20,7 +20,10 @@ from fleetpy import unit
 LOGGER = logging.getLogger(__name__)
 
 MACHINE = collections.namedtuple('Machine', ['id', 'ipaddr', 'metadata'])
-
+MACHINE_STATE = collections.namedtuple('MachineState', ['id', 'ipaddr',
+                                                        'metadata', 'unit',
+                                                        'loaded', 'state',
+                                                        'sub_state', 'hash'])
 STATE = collections.namedtuple('State', ['machine', 'unit', 'loaded', 'state',
                                          'sub_state', 'hash'])
 
@@ -60,7 +63,6 @@ class _Adapter(object):
     def _build_url(self, request_path, next_page_token=None):
         url = path.join(self._endpoint, self.BASE_URI, request_path)
         if not next_page_token:
-            print(url)
             return url
         return '{0}?nextPageToken={1}'.format(url, next_page_token)
 
@@ -84,13 +86,29 @@ class Client(object):
         """
         return self._list_machines()
 
-    def state(self):
+    def state(self, full=False, unit_name=None):
         """
 
         :rtype: list
 
         """
-        return self._list_states()
+        states = self._list_states()
+        if unit_name:
+            states = [s for s in states if s.unit == unit_name]
+        if not full:
+            return states
+        machines, values = {}, []
+        for machine in self._list_machines():
+            machines[machine.id] = {'ipaddr': machine.ipaddr,
+                                    'metadata': machine.metadata}
+        for state in states:
+            values.append(MACHINE_STATE(state.machine,
+                                        machines[state.machine]['ipaddr'],
+                                        machines[state.machine]['metadata'],
+                                        state.unit, state.loaded,
+                                        state.state, state.sub_state,
+                                        state.hash))
+        return values
 
     def unit(self, name, version=None, from_str=None, from_file=None):
         """
