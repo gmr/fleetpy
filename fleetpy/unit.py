@@ -66,8 +66,6 @@ class Unit(object):
         result = self._adapter.get('units/{0}'.format(self.name))
         if result.status_code == 200:
             value = result.json()
-            print(value.keys())
-            print(value.items())
             self._state = value.get('currentState', self._state)
             self._desired_state = value.get('desiredState', self._desired_state)
             if value.get('options'):
@@ -103,14 +101,12 @@ class Unit(object):
         self._desired_state = 'launched'
         result = self._adapter.put('units/{0}'.format(self.name),
                                    {'desiredState': self._desired_state})
-        print(result.status_code, result.content)
         return result.status_code == 204
 
     def stop(self):
         self._desired_state = 'inactive'
         result = self._adapter.put('units/{0}'.format(self.name),
                                    {'desiredState': self._desired_state})
-        print(result.status_code, result.content)
         return result.status_code == 204
 
     def submit(self):
@@ -128,11 +124,13 @@ class Unit(object):
         key, section, value = None, None, ''
         for line in value_in.split('\n'):
             if not line.strip():
+                self._options.append(OPTION(section, key, '\n'.join(value)))
+                key, value = None, None
                 continue
             if line.startswith('[') and line.endswith(']'):
                 section = line[1:-1]
                 continue
-            if line.startswith(' '):
+            if line.startswith(' ') or '=' not in line:
                 value.append(line.strip())
                 continue
             parts = line.strip().split('=', 1)
