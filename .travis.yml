@@ -1,0 +1,29 @@
+sudo: false
+language: python
+python:
+  - 2.6
+  - 2.7
+  - pypy
+  - 3.2
+  - 3.3
+  - 3.4
+install:
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install unittest2 --download-cache $HOME/.pip-cache; fi
+  - pip install -r requirements.txt --download-cache $HOME/.pip-cache
+  - pip install -r test-requirements.txt --download-cache $HOME/.pip-cache
+script: nosetests --with-coverage --cover-package=fleetpy -v
+after_success:
+  - codecov
+deploy:
+  distributions: sdist bdist_wheel
+  provider: pypi
+  user: crad
+  on:
+    python: 2.7
+    tags: true
+    all_branches: true
+  password:
+    secure: "X0J5MpL6kiADUPeWBavZuHGru0SySCxIIKH0zdjWNyxtshcr0d/3Mk25uoV3trFeVurOjp+kMXOeAbMVGKfa4PHN+pUd5rS+/JP2YCXiyG4O3j5sp5s+XEFFxcQandyW35PCmhB+Xz2DSSeVs0khtmBjqI7yCrtjlhJNx9QLJf1/Gqej31E6XP1N6vESoQTBy3Se6l5b2nOmAgxi9wqrb6AjEWfZJ/SLPpNHKAb/MjlAaTmydlMUh9lDWUMyEOnjZWyT2izjjWFtKDYR7xraQjV7U6GfKh79qQPjDpzekRYfLic+Frduo01o5PRqeKMlKXqe/gg8/btnFHAAWL2hrN32Hl40GZ3wweXRVg2pLPyrxzdROHrd7S6QXgJgCIboEWKl1GmQmGkkqDoDthvf75ZUbxxhfnWGITXN/KyQc0tHMrTcsy63/Levq2T2qAK0FoaKpjt7BeSWdd4H/WBWZLKCnuK4+Wu9cxKWs0CTZUrDYyEHChj9ZBf0AME5QceIsUD8Dj1W48BewJeXEDSQ1VvWcApa0jx8RxMy1ppFoonthyAp0C+A1HyDvoR4cpHtbxmzwK2opvlYgVQim1TLeHMeWuGep6gA8WexvX/mAjnbTQq0AL7TfRSV8Q+GqAtk+cOHB7+5VwMma0zDo1aLBpxExrWppcXtI8PgBD1xa/M="
+cache:
+  directories:
+    - $HOME/.pip-cache/
