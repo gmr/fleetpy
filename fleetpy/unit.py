@@ -18,7 +18,7 @@ class Unit(object):
         if name.endswith('.service'):
             name = name[0:-8]
         if '@' in name:
-            name, value = name.split('@')
+            name, version = name.split('@')
         self._name = name
         self._options = []
         self._version = version
