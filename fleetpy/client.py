@@ -23,8 +23,6 @@ MACHINE = collections.namedtuple('Machine', ['id', 'ipaddr', 'metadata'])
 
 STATE = collections.namedtuple('State', ['machine', 'unit', 'loaded', 'state',
                                          'sub_state', 'hash'])
-UNIT = collections.namedtuple('Unit', ['name',  'current_state',
-                                       'desired_state', 'machine', 'options'])
 
 
 class _Adapter(object):
@@ -68,7 +66,11 @@ class _Adapter(object):
 
 
 class Client(object):
+    """Create a Fleet API Client
 
+    :param str endpoint: Base endpoint URL for accessing Fleet
+
+    """
     def __init__(self, endpoint=None):
         self._adapter = _Adapter(endpoint)
 
