@@ -146,7 +146,7 @@ class Client(object):
                                         row['metadata']))
             if 'nextPageToken' in data:
                 LOGGER.debug('Retrieving next page of results')
-                machines += self._list_machines(data['next_page_token'])
+                machines += self._list_machines(data['nextPageToken'])
         return machines
 
     def _list_states(self, next_page_token=None):
@@ -163,7 +163,7 @@ class Client(object):
                                     row['hash']))
             if 'nextPageToken' in data:
                 LOGGER.debug('Retrieving next page of results')
-                states += self._list_states(data['next_page_token'])
+                states += self._list_states(data['nextPageToken'])
         return states
 
     def _list_units(self, next_page_token=None):
@@ -183,5 +183,5 @@ class Client(object):
                 units.append(value)
             if 'nextPageToken' in data:
                 LOGGER.debug('Retrieving next page of results')
-                units += self._list_units(data['next_page_token'])
+                units += self._list_units(data['nextPageToken'])
         return units
