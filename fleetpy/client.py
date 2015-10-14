@@ -171,7 +171,7 @@ class Client(object):
         response = self._adapter.get('units', next_page_token)
         if response.status_code == 200:
             data = response.json()
-            for row in data.get('units'):
+            for row in data.get('units', []):
                 value = unit.Unit(self._adapter,
                                   row['name'])
                 value.set_desired_state(row['desiredState'])
