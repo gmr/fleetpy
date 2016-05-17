@@ -2,6 +2,8 @@ fleetpy
 =======
 An opinionated fleet API client for Python.
 
+:boom:**Important**:boom: This project is deprecated and no longer maintained. If you'd like to take it over, please contact me.
+
 Usage
 -----
 
